@@ -7,18 +7,21 @@
  *
  */
 public class MinHeap { 
-    private int[] Heap; 
+    private Data_Record[] Heap; 
     private int size; 
     private int maxsize; 
   
-    private static final int FRONT = 1; 
+    public final int BLOCK_SIZE = 8192;
+    public final int RECORD_SIZE = 16;
+    private static final int FRONT = 1;
   
-    public MinHeap(int maxsize) 
-    { 
-        this.maxsize = maxsize; 
+    public MinHeap() 
+    {
+        //Initialize Heap to have 8 blocks
+        this.maxsize = 8 * BLOCK_SIZE;
         this.size = 0; 
-        Heap = new int[this.maxsize + 1]; 
-        Heap[0] = Integer.MIN_VALUE; 
+        Heap = new Data_Record[this.maxsize + 1]; 
+        Heap[0] = new Data_Record(0, Integer.MIN_VALUE); 
     } 
   
     // Function to return the position of  
@@ -57,7 +60,7 @@ public class MinHeap {
     // Function to swap two nodes of the heap 
     private void swap(int fpos, int spos) 
     { 
-        int tmp; 
+        Data_Record tmp; 
         tmp = Heap[fpos]; 
         Heap[fpos] = Heap[spos]; 
         Heap[spos] = tmp; 
@@ -70,12 +73,12 @@ public class MinHeap {
         // If the node is a non-leaf node and greater 
         // than any of its child 
         if (!isLeaf(pos)) { 
-            if (Heap[pos] > Heap[leftChild(pos)] 
-                || Heap[pos] > Heap[rightChild(pos)]) { 
+            if (Heap[pos].getValue() > Heap[leftChild(pos)].getValue() 
+                || Heap[pos].getValue() > Heap[rightChild(pos)].getValue()) { 
   
                 // Swap with the left child and heapify 
                 // the left child 
-                if (Heap[leftChild(pos)] < Heap[rightChild(pos)]) { 
+                if (Heap[leftChild(pos)].getValue() < Heap[rightChild(pos)].getValue()) { 
                     swap(pos, leftChild(pos)); 
                     minHeapify(leftChild(pos)); 
                 } 
@@ -91,27 +94,16 @@ public class MinHeap {
     } 
   
     // Function to insert a node into the heap 
-    public void insert(int element) 
+    public void insert(Data_Record element) 
     { 
         Heap[++size] = element; 
         int current = size; 
   
-        while (Heap[current] < Heap[parent(current)]) { 
+        while (Heap[current].getValue() < Heap[parent(current)].getValue()) { 
             swap(current, parent(current)); 
             current = parent(current); 
         } 
-    } 
-  
-    // Function to print the contents of the heap 
-    public void print() 
-    { 
-        for (int i = 1; i <= size / 2; i++) { 
-            System.out.print(" PARENT : " + Heap[i] 
-                     + " LEFT CHILD : " + Heap[2 * i] 
-                   + " RIGHT CHILD :" + Heap[2 * i + 1]); 
-            System.out.println(); 
-        } 
-    } 
+    }
   
     // Function to build the min heap using  
     // the minHeapify 
@@ -124,31 +116,17 @@ public class MinHeap {
   
     // Function to remove and return the minimum 
     // element from the heap 
-    public int remove() 
+    public Data_Record remove() 
     { 
-        int popped = Heap[FRONT]; 
+        Data_Record popped = Heap[FRONT]; 
         Heap[FRONT] = Heap[size--]; 
         minHeapify(FRONT); 
         return popped; 
-    } 
-  
-    // Driver code 
-    public static void main(String[] arg) 
-    { 
-        System.out.println("The Min Heap is "); 
-        MinHeap minHeap = new MinHeap(15); 
-        minHeap.insert(5); 
-        minHeap.insert(3); 
-        minHeap.insert(17); 
-        minHeap.insert(10); 
-        minHeap.insert(84); 
-        minHeap.insert(19); 
-        minHeap.insert(6); 
-        minHeap.insert(22); 
-        minHeap.insert(9); 
-        minHeap.minHeap(); 
-  
-        minHeap.print(); 
-        System.out.println("The Min val is " + minHeap.remove()); 
-    } 
+    }
+    
+    //Used to return max heap size
+    public int maxSize()
+    {
+        return this.maxsize;
+    }
 }
