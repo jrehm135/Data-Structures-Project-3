@@ -11,8 +11,9 @@ public class MinHeap {
     private int size; 
     private int maxsize; 
   
-    public final int BLOCK_SIZE = 8192;
-    public final int RECORD_SIZE = 16;
+    //Heap constants
+    private final int BLOCK_SIZE = 8192;
+    private final int NUM_RECORDS = 512;
     private static final int FRONT = 1;
   
     public MinHeap() 
@@ -22,7 +23,18 @@ public class MinHeap {
         this.size = 0; 
         Heap = new Data_Record[this.maxsize + 1]; 
         Heap[0] = new Data_Record(0, Integer.MIN_VALUE); 
-    } 
+    }
+    
+    public MinHeap(Data_Record[] recArray) {
+      //Initialize Heap to have 8 blocks
+        this.maxsize = 8 * BLOCK_SIZE;
+        this.size = maxsize; 
+        Heap = new Data_Record[this.maxsize + 1]; 
+        Heap[0] = new Data_Record(0, Integer.MIN_VALUE);
+        for(int i = 0; i < NUM_RECORDS; i++) {
+            insert(recArray[i]);
+        }
+    }
   
     // Function to return the position of  
     // the parent for the node currently  
