@@ -136,9 +136,9 @@ public class MinHeap {
         return popped; 
     }
     
-    //Used to return max heap size
-    public int maxSize()
+    //Used to return heap size
+    public int getSize()
     {
-        return this.maxsize;
+        return this.size;
     }
 }
