@@ -48,7 +48,7 @@ public class Externalsort {
         }
         
         //This section makes a run through the file without marking
-        for(int i = 0; heap.getSize() > 0; i += 16) {
+        for(int i = 0; heap.getMark() > 0; i += 16) {
             //Heap has burned through an input block, read in new one
             if(i % BLOCK_SIZE == 0) {
                 //Read in a block for heap
