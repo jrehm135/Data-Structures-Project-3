@@ -1,79 +1,103 @@
 /**
  * 
+ * @author Quinton Miller
+ * @author Josh Rehm
+ * @version 4/8/2019
+ * 
+ *          This is an implementation of the heap used to sort
+ *          the values being read in from the input file
  */
 
-/**
- * @author Josh
- *
- */
 public class MinHeap { 
-    private Data_Record[] Heap; 
+    private dataRecord[] heap; 
     private int size; 
     private int maxsize;
     private int markLoc;
   
     //Heap constants
-    private final int NUM_RECORDS = 512;
-    private final int ROOT = 0;
+    private final int numRecords = 512;
+    private final int root = 0;
   
+    /**
+     *  This creates an empty heap with 8 blocks of memory
+     */
     public MinHeap() 
     {
         //Initialize Heap to have 8 blocks
-        this.maxsize = 8 * NUM_RECORDS;
-        this.markLoc = maxsize;
+        this.maxsize = 8 * numRecords;
+        this.markLoc = maxsize - 1;
         this.size = 0; 
-        Heap = new Data_Record[this.maxsize];
+        heap = new dataRecord[this.maxsize];
     }
     
-    public MinHeap(Data_Record[] recArray) {
+    /**
+     *  @param recArray An array of data records to be inserted
+     *  
+     *  This creates a heap with 8 blocks of memory and inserts
+     *  the array passed to it
+     */
+    public MinHeap(dataRecord[] recArray) {
       //Initialize Heap to have 8 blocks
-        this.maxsize = 8 * NUM_RECORDS;
+        this.maxsize = 8 * numRecords;
         this.size = maxsize; 
         this.markLoc = maxsize;
-        Heap = new Data_Record[this.maxsize];
-        for(int i = 0; i < NUM_RECORDS; i++) {
+        heap = new dataRecord[this.maxsize];
+        for (int i = 0; i < numRecords; i++) {
             insert(recArray[i]);
         }
     }
   
-    // Function to return the position of  
-    // the parent for the node currently  
-    // at pos 
+    /**
+     *  @param pos The position of the current node
+     *  @return The index of the parent of current position
+     */
     private int parent(int pos) 
     { 
         return (pos - 1) / 2; 
     } 
   
-    // Function to return the position of the  
-    // left child for the node currently at pos 
+    /**
+     *  @param pos The position of the current node
+     *  @return The index of the leftChild of current position
+     */
     private int leftChild(int pos) 
     {
         return (2 * pos) + 1; 
     } 
   
-    // Function to return the position of  
-    // the right child for the node currently  
-    // at pos 
+    /**
+     *  @param pos The position of the current node
+     *  @return The index of the rightChild of current position
+     */
     private int rightChild(int pos) 
     {
         return (2 * pos) + 2; 
     }
   
-    // Function to swap two nodes of the heap 
+    /**
+     *  @param fpos The position of one node to swap
+     *  @param spos The position of other node to swap
+     *  
+     *  Swaps two nodes into the opposite positions
+     */
     private void swap(int fpos, int spos) 
     { 
-        Data_Record tmp; 
-        tmp = Heap[fpos]; 
-        Heap[fpos] = Heap[spos]; 
-        Heap[spos] = tmp; 
+        dataRecord tmp; 
+        tmp = heap[fpos]; 
+        heap[fpos] = heap[spos]; 
+        heap[spos] = tmp; 
     } 
   
-    // Function to heapify the node at pos 
+    /**
+     *  @param pos The starting node to begin heaping, usually root
+     *  
+     *  Recursively reheaps the heap if it is disordered
+     */
     private void minHeapify(int pos) 
     {
         int minIndex;
-        if(rightChild(pos) >= size) {
-            if(leftChild(pos) >= size) {
+        if (rightChild(pos) >= size) {
+            if (leftChild(pos) >= size) {
                 return;
             }
             else {
@@ -81,65 +105,83 @@ public class MinHeap {
             }
         }
         else {
-            if(Heap[leftChild(pos)].getValue()
-                    > Heap[rightChild(pos)].getValue()) {
+            if (heap[leftChild(pos)].getValue()
+                    > heap[rightChild(pos)].getValue()) {
                 minIndex = rightChild(pos);
             }
             else {
                 minIndex = leftChild(pos);
             }
         }
-        if(Heap[pos].getValue() > Heap[minIndex].getValue()) {
+        if (heap[pos].getValue() > heap[minIndex].getValue()) {
             swap(pos, minIndex);
             minHeapify(minIndex);
         }
     } 
   
-    // Function to insert a node into the heap 
-    public boolean insert(Data_Record element) 
+    /**
+     *  @param element The data record to insert
+     *  @return A boolean value indicating success
+     *  
+     *  Inserts a value into heap and sifts up according to heap logic
+     */
+    public boolean insert(dataRecord element) 
     { 
-        if(size + 1 == maxsize) {
+        if (size + 1 == maxsize) {
             return false;
         }
-        Heap[size++] = element;
+        heap[size++] = element;
         int current = size;
         
         siftUp(current - 1);
         return true;
     }
     
-    // Function to insert a node into the heap once runs have begun
-    public boolean runInsert(Data_Record element) 
+    /**
+     *  @param element The data record to insert
+     *  @return A boolean value indicating success
+     *  
+     *  Inserts a value into heap and sifts up according to heap logic,
+     *  also takes into account the end of the heap and places elements
+     *  at the end if it is less than the current run's minimum
+     */
+    public boolean runInsert(dataRecord element) 
     { 
-        if(size + 1 == maxsize) {
+        if (size + 1 == maxsize) {
             return false;
         }
-        Heap[size++] = element;
+        heap[size++] = element;
         int current = size;
         
         //If the element shouldn't be in the 
-        if(element.getValue() < Heap[ROOT].getValue()) {
+        if (element.getValue() < heap[root].getValue()) {
             markLoc--;
             return true;
         }
         swap(current, markLoc);
 
-        siftUp(current - 1);
+        siftUp(markLoc - 1);
         
         return true;
     }
     
+    /**
+     *  @param index The data record to insert
+     *  
+     *  Recursively sifts nodes up according to heap logic
+     */
     private void siftUp(int index) {
-        if(index != 0) {
-            if(Heap[parent(index)].getValue() > Heap[index].getValue()) {
+        if (index != 0) {
+            if (heap[parent(index)].getValue() > heap[index].getValue()) {
                 swap(index, parent(index));
                 siftUp(parent(index));
             }
         }
     }
   
-    // Function to build the min heap using  
-    // the minHeapify 
+    /**  
+     *  Builds a min heap from the array
+     */
     public void minHeap() 
     { 
         for (int pos = (size / 2) - 1; pos >= 0; pos--) { 
@@ -147,29 +189,45 @@ public class MinHeap {
         } 
     } 
   
-    // Function to remove and return the minimum 
-    // element from the heap 
-    public Data_Record remove() 
+    /**
+     *  @return The minimum element returned from the heap
+     *  
+     *  Removes a value from the heap, decrements size, and returns
+     *  element
+     */
+    public dataRecord remove() 
     { 
-        Data_Record popped = Heap[ROOT]; 
-        Heap[ROOT] = Heap[size--]; 
-        minHeapify(ROOT); 
+        if (size == 0) {
+            System.out.print("Heap is empty, cannot remove!");
+            return null;
+        }
+        dataRecord popped = heap[root]; 
+        heap[root] = heap[--size];
+        minHeapify(root); 
         return popped; 
     }
     
-    //Used to return heap size
+    /**
+     *  @return The size of the heap
+     */
     public int getSize()
     {
         return this.size;
     }
     
-    //Used to return portion of the array taken up by heap
+    /**
+     *  @return The mark position
+     */
     public int getMark()
     {
         return this.markLoc;
     }
     
-    //Used to set portion of the array in a heap
+    /**
+     *  @param newSize The new location to have the mark
+     *  
+     *  Sets the mark to a new location in the heap
+     */
     public void setMark(int newSize)
     {
         this.markLoc = newSize;
